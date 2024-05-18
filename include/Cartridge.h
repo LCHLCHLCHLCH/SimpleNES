@@ -13,7 +13,7 @@ namespace sn
     {
     public:
         Cartridge();
-        bool loadFromFile(std::string path);
+        bool loadFromFile();
         const std::vector<Byte> &getROM();
         const std::vector<Byte> &getVROM();
         bool hasExtendedRAM();

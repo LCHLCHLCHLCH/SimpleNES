@@ -40,10 +40,12 @@ namespace sn
         m_ppu.setInterruptCallback([&](){ m_cpu.interrupt(InterruptType::NMI); });
     }
 
-    void Emulator::run(std::string rom_path)
+    void Emulator::run()
     {
-        if (!m_cartridge.loadFromFile(rom_path))
-            return;
+        m_cartridge.loadFromFile();
+
+        // if (!m_cartridge.loadFromFile(rom_path))
+        //     return;
 
         m_mapper = Mapper::createMapper(static_cast<Mapper::Type>((Byte)1),
                                         m_cartridge,

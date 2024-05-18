@@ -2,6 +2,8 @@
 #include "Log.h"
 #include "Mapper.h"
 
+#include "rom.h"
+
 #include <fstream>
 #include <string>
 
@@ -22,27 +24,28 @@ namespace sn
         return m_CHR_ROM;
     }
 
-
     bool Cartridge::hasExtendedRAM()
     {
         return false;
     }
 
-    bool Cartridge::loadFromFile(std::string path)
+    bool Cartridge::loadFromFile()
     {
-        std::ifstream romFile(path, std::ios_base::binary | std::ios_base::in);
-        if (!romFile)//若romFile为0指针则说明没有打开
-        {
-            LOG(Error) << "Could not open ROM file from path: " << path << std::endl;
-            return false;
-        }
+        // std::ifstream romFile(path, std::ios_base::binary | std::ios_base::in);
+
+        LCH::rom romFile;
+
+        // if (!romFile)//若romFile为0指针则说明没有打开
+        // {
+        //     LOG(Error) << "Could not open ROM file from path: " << path << std::endl;
+        //     return false;
+        // }
 
         std::vector<Byte> header;
 
         // Header
         header.resize(0x10);
-        romFile.read(reinterpret_cast<char *>(&header[0]), 0x10);
-
+        romFile.read((char *)(&header[0]), 0x10);
 
         Byte banks = header[4];
         LOG(Info) << "16KB PRG-ROM Banks: " << +banks << std::endl;
@@ -56,24 +59,27 @@ namespace sn
         m_extendedRAM = header[6] & 0x2;
         LOG(Info) << "Extended (CPU) RAM: " << std::boolalpha << m_extendedRAM << std::endl;
 
-
         // PRG-ROM 16KB banks
         m_PRG_ROM.resize(0x4000 * banks);
-        if (!romFile.read(reinterpret_cast<char *>(&m_PRG_ROM[0]), 0x4000 * banks))
-        {
-            LOG(Error) << "Reading PRG-ROM from image file failed." << std::endl;
-            return false;
-        }
+        romFile.read(reinterpret_cast<char *>(&m_PRG_ROM[0]), 0x4000 * banks);
+
+        // if (!romFile.read(reinterpret_cast<char *>(&m_PRG_ROM[0]), 0x4000 * banks))
+        // {
+        //     LOG(Error) << "Reading PRG-ROM from image file failed." << std::endl;
+        //     return false;
+        // }
 
         // CHR-ROM 8KB banks
+
         if (vbanks)
         {
             m_CHR_ROM.resize(0x2000 * vbanks);
-            if (!romFile.read(reinterpret_cast<char *>(&m_CHR_ROM[0]), 0x2000 * vbanks))
-            {
-                LOG(Error) << "Reading CHR-ROM from image file failed." << std::endl;
-                return false;
-            }
+            romFile.read(reinterpret_cast<char *>(&m_CHR_ROM[0]), 0x2000 * vbanks);
+            // if (!romFile.read(reinterpret_cast<char *>(&m_CHR_ROM[0]), 0x2000 * vbanks))
+            // {
+            //     LOG(Error) << "Reading CHR-ROM from image file failed." << std::endl;
+            //     return false;
+            // }
         }
         else
             LOG(Info) << "Cartridge with CHR-RAM." << std::endl;

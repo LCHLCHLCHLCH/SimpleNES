@@ -103,6 +103,6 @@ int main(int argc, char** argv)
 
     sn::parseControllerConf("keybindings.conf", p1, p2);
     emulator.setKeys(p1, p2);
-    emulator.run(path);
+    emulator.run();
     return 0;
 }

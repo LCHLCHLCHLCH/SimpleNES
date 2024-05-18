@@ -20,7 +20,7 @@ namespace sn
     {
     public:
         Emulator();
-        void run(std::string rom_path);
+        void run();
         void setVideoWidth(int width);
         void setVideoHeight(int height);
         void setVideoScale(float scale);
